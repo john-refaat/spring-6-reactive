@@ -9,3 +9,13 @@ CREATE TABLE if NOT EXISTS beer
     created_date   timestamp,
     last_modified_date timestamp
 );
+
+CREATE TABLE if NOT EXISTS customer
+(
+    id             integer NOT NULL PRIMARY KEY AUTO_INCREMENT,
+    first_name      varchar(255),
+    last_name     varchar (255),
+    email            varchar (255),
+    created_date   timestamp,
+    last_modified_date timestamp
+);
