@@ -55,17 +55,14 @@ public class BeerController {
     @PatchMapping("/{beerId}")
     public Mono<ResponseEntity<Void>> patchBeerById(@PathVariable Integer beerId, @Validated @RequestBody BeerDTO beer) {
         log.info("Patch: {}, with Id: {}", beer, beerId);
-        return beerService.patchBeer(beerId, beer)
-                .map(patchedBeer -> ResponseEntity.ok()
-                        .header(LOCATION, BEER_PATH+"/"+patchedBeer.getId())
-                        .build());
+        return beerService.patchBeer(beerId, beer).map(patchedBeer -> ResponseEntity.ok()
+                .header(LOCATION, BEER_PATH+"/"+patchedBeer.getId()).build());
     }
 
     @DeleteMapping("/{beerId}")
     public Mono<ResponseEntity<Void>> deleteBeer(@PathVariable Integer beerId) {
         log.info("Delete Beer By Id: {}", beerId);
-        return beerService.deleteBeer(beerId)
-               .map(deletedBeer -> ResponseEntity.noContent().build());
+        return beerService.deleteBeer(beerId).thenReturn(ResponseEntity.noContent().build());
     }
 
     @GetMapping({"", "/"})
