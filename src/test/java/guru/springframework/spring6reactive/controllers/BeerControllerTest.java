@@ -21,7 +21,7 @@ import java.math.BigDecimal;
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 @SpringBootTest
 @AutoConfigureWebTestClient
-class BeerControllerTest {
+    class BeerControllerTest {
 
     private static final String BASE_PATH = "/api/v2/beer";
     private static final BeerDTO beer = BeerDTO.builder()

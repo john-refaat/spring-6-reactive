@@ -4,6 +4,7 @@ import guru.springframework.spring6reactive.model.CustomerDTO;
 import guru.springframework.spring6reactive.services.CustomerService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -37,6 +38,7 @@ public class CustomerController {
         return customerService.findCustomerById(customerId);
     }
 
+    @ResponseStatus(HttpStatus.CREATED)
     @PostMapping({"", "/"})
     public Mono<CustomerDTO> createCustomer(@Validated @RequestBody CustomerDTO customerDTO) {
         log.info("Creating customer: {}", customerDTO);
@@ -61,9 +63,12 @@ public class CustomerController {
     }
 
     @DeleteMapping(CUSTOMER_ID)
-    public Mono<Void> deleteCustomer(@PathVariable Integer customerId) {
+    public Mono<ResponseEntity<Object>> deleteCustomer(@PathVariable Integer customerId) {
         log.info("Deleting customer with Id: {}", customerId);
-        return customerService.deleteCustomer(customerId);
+        return customerService.findCustomerById(customerId)
+                .flatMap(customer -> customerService.deleteCustomer(customerId).thenReturn(ResponseEntity.noContent().build()))
+                .defaultIfEmpty(ResponseEntity.notFound().build());
+        //return customerService.deleteCustomer(customerId).thenReturn(ResponseEntity.noContent().build());
     }
 
 
