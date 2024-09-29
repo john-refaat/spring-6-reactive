@@ -1,9 +1,6 @@
 package guru.springframework.spring6reactive.model;
 
-import jakarta.validation.constraints.Max;
-import jakarta.validation.constraints.Min;
-import jakarta.validation.constraints.Positive;
-import jakarta.validation.constraints.Size;
+import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -24,19 +21,24 @@ public class BeerDTO {
 
     private Integer id;
 
+    @NotBlank
     @Size(min=3, max=255, message = "Name length must be between 3 and 255 characters")
     private String beerName;
 
+    @NotBlank
     @Size(min=3, max=255)
     private String beerStyle;
 
+    @NotBlank
     @Size(min=3, max=255)
     private String upc;
 
+    @NotNull
     @Min(1)
     @Max(999)
     private Integer quantityOnHand;
 
+    @NotNull
     @Positive
     private BigDecimal price;
 

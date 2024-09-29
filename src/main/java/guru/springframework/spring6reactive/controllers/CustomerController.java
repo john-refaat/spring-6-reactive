@@ -8,6 +8,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -63,11 +64,11 @@ public class CustomerController {
     }
 
     @DeleteMapping(CUSTOMER_ID)
-    public Mono<ResponseEntity<Object>> deleteCustomer(@PathVariable Integer customerId) {
+    public Mono<ResponseEntity<Void>> deleteCustomer(@PathVariable Integer customerId) {
         log.info("Deleting customer with Id: {}", customerId);
         return customerService.findCustomerById(customerId)
-                .flatMap(customer -> customerService.deleteCustomer(customerId).thenReturn(ResponseEntity.noContent().build()))
-                .defaultIfEmpty(ResponseEntity.notFound().build());
+                .switchIfEmpty(Mono.error(new ResponseStatusException(HttpStatus.NOT_FOUND)))
+                .flatMap(customer -> customerService.deleteCustomer(customerId).thenReturn(ResponseEntity.noContent().build()));
         //return customerService.deleteCustomer(customerId).thenReturn(ResponseEntity.noContent().build());
     }
 

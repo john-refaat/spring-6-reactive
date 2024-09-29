@@ -1,10 +1,7 @@
 package guru.springframework.spring6reactive.controllers;
 
 import guru.springframework.spring6reactive.model.BeerDTO;
-import org.junit.jupiter.api.MethodOrderer;
-import org.junit.jupiter.api.Order;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestMethodOrder;
+import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -24,16 +21,21 @@ import java.math.BigDecimal;
     class BeerControllerTest {
 
     private static final String BASE_PATH = "/api/v2/beer";
-    private static final BeerDTO beer = BeerDTO.builder()
-            .beerName("New Beer")
-            .beerStyle("New Style")
-            .upc("1234567890123")
-            .quantityOnHand(100)
-            .price(new BigDecimal("9.99"))
-            .build();
+    private BeerDTO beer;
 
     @Autowired
     WebTestClient webTestClient;
+
+    @BeforeEach
+    void setUp() {
+        beer = BeerDTO.builder()
+                .beerName("New Beer")
+                .beerStyle("New Style")
+                .upc("1234567890123")
+                .quantityOnHand(100)
+                .price(new BigDecimal("9.99"))
+                .build();
+    }
 
     @Test
     void createBeer() {
@@ -46,6 +48,32 @@ import java.math.BigDecimal;
         System.out.println(result);
     }
 
+    @Test
+    void createBeerBlankName() {
+        beer.setBeerName("");
+        webTestClient.post().uri(BASE_PATH).body(Mono.just(beer), BeerDTO.class)
+               .header("Content-Type", "application/json")
+               .exchange()
+               .expectStatus().isBadRequest();
+    }
+
+    @Test
+    void createBeerBlankStyle() {
+        beer.setBeerStyle("");
+        webTestClient.post().uri(BASE_PATH).body(Mono.just(beer), BeerDTO.class)
+               .header("Content-Type", "application/json")
+               .exchange()
+               .expectStatus().isBadRequest();
+    }
+    @Test
+    void createBeerInvalidPrice() {
+        beer.setPrice(new BigDecimal("-9.99"));
+        webTestClient.post().uri(BASE_PATH).body(Mono.just(beer), BeerDTO.class)
+               .header("Content-Type", "application/json")
+               .exchange()
+               .expectStatus().isBadRequest();
+    }
+
     @Order(3)
     @Test
     void updateBeer() {
@@ -56,6 +84,14 @@ import java.math.BigDecimal;
                 .expectBody(BeerDTO.class);
     }
 
+    @Test
+    void updateBeerNotFound() {
+        webTestClient.put().uri(BASE_PATH+"/{beerId}", 1000).body(Mono.just(beer), BeerDTO.class)
+               .header("Content-Type", "application/json")
+               .exchange()
+               .expectStatus().isNotFound();
+    }
+
     @Order(1)
     @Test
     void findBeerById() {
@@ -63,6 +99,12 @@ import java.math.BigDecimal;
                 .expectStatus().isOk()
                 .expectHeader().valueEquals("content-type", "application/json")
                 .expectBody(BeerDTO.class);
+    }
+
+    @Test
+    void findBeerByIdNotFound() {
+        webTestClient.get().uri(BASE_PATH+"/{beerId}", 1000).exchange()
+               .expectStatus().isNotFound();
     }
 
     @Order(4)
@@ -77,9 +119,23 @@ import java.math.BigDecimal;
     }
 
     @Test
+    void patchBeerByIdNotFound() {
+        webTestClient.patch().uri(BASE_PATH+"/{beerId}", 1000).body(Mono.just(beer), BeerDTO.class)
+               .header("Content-Type", "application/json")
+               .exchange()
+               .expectStatus().isNotFound();
+    }
+
+    @Test
     void deleteBeer() {
         webTestClient.delete().uri(BASE_PATH+"/{beerId}", 1).exchange()
                .expectStatus().isNoContent();
+    }
+
+    @Test
+    void deleteBeerNotFound() {
+        webTestClient.delete().uri(BASE_PATH+"/{beerId}", 1000).exchange()
+               .expectStatus().isNotFound();
     }
 
     @Order(2)
