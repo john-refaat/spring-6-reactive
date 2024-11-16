@@ -1,6 +1,7 @@
 package guru.springframework.spring6reactive.controllers;
 
 import guru.springframework.spring6reactive.domain.Customer;
+import guru.springframework.spring6reactive.model.CustomerPatchDTO;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
@@ -24,7 +25,7 @@ class CustomerControllerTest {
 
     private static final String BASE_PATH = "/api/v2/customer";
     private static final Customer customer = Customer.builder()
-            .firstName("John").lastName("Stefanos").build();
+            .firstName("John").lastName("Stefanos").email("john@example.com").build();
 
     @Autowired
     CustomerController customerController;
@@ -53,6 +54,13 @@ class CustomerControllerTest {
                 .jsonPath("$.lastName").isEqualTo("Doe");
     }
 
+    @Test
+    void getCustomerNotFound() {
+        webTestClient.get().uri(BASE_PATH + "/100").header("Accept", "application/json")
+                .exchange()
+                .expectStatus().isNotFound();
+    }
+
     @Order(3)
     @Test
     void createCustomer() {
@@ -66,11 +74,19 @@ class CustomerControllerTest {
                 .consumeWith(result -> log.info("Response: {}", result));
     }
 
+    @Test
+    void createCustomerValidationErrors() {
+        webTestClient.post().uri(BASE_PATH).header("Content-type", "application/json")
+               .bodyValue(Customer.builder().firstName("").lastName("Doe").build())
+               .exchange()
+               .expectStatus().isBadRequest();
+    }
+
     @Order(4)
     @Test
     void updateCustomer() {
         webTestClient.put().uri(BASE_PATH + "/1").header("Content-type", "application/json")
-               .bodyValue(Customer.builder().id(1).firstName("Bob").lastName("Doe").build())
+               .bodyValue(Customer.builder().id(1).firstName("Bob").lastName("Doe").email("john.doe@example.com").build())
                .exchange()
                .expectStatus().isOk()
                 .expectHeader().exists("Location")
@@ -81,7 +97,7 @@ class CustomerControllerTest {
     @Test
     void updateCustomerNotFound() {
         webTestClient.put().uri(BASE_PATH + "/100").header("Content-type", "application/json")
-               .bodyValue(Customer.builder().id(100).firstName("Bob").lastName("Doe").build())
+               .bodyValue(Customer.builder().id(100).firstName("Bob").lastName("Doe").email("john.doe@example.com").build())
                .exchange()
                .expectStatus().isNotFound();
     }
@@ -94,6 +110,22 @@ class CustomerControllerTest {
                .exchange()
                .expectStatus().isOk()
                .expectBody().consumeWith(result -> log.info("Response: {}", result));
+    }
+
+    @Test
+    void patchCustomerNotFound() {
+        webTestClient.patch().uri(BASE_PATH + "/100").header("Content-type", "application/json-patch+json")
+               .bodyValue("{\"firstName\": \"Alice\"}")
+               .exchange()
+               .expectStatus().isNotFound();
+    }
+
+    @Test
+    void patchCustomerBadRequest() {
+        webTestClient.patch().uri(BASE_PATH + "/1").header("Content-type", "application/json-patch+json")
+               .bodyValue(CustomerPatchDTO.builder().email("invalidEmail").build())
+               .exchange()
+               .expectStatus().isBadRequest();
     }
 
     @Test

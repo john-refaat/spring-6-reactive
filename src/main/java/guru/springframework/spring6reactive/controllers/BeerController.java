@@ -1,6 +1,7 @@
 package guru.springframework.spring6reactive.controllers;
 
 import guru.springframework.spring6reactive.model.BeerDTO;
+import guru.springframework.spring6reactive.model.BeerPatchDTO;
 import guru.springframework.spring6reactive.services.BeerService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -56,7 +57,7 @@ public class BeerController {
     }
 
     @PatchMapping("/{beerId}")
-    public Mono<ResponseEntity<Void>> patchBeerById(@PathVariable Integer beerId, @Validated @RequestBody BeerDTO beer) {
+    public Mono<ResponseEntity<Void>> patchBeerById(@PathVariable Integer beerId, @Validated @RequestBody BeerPatchDTO beer) {
         log.info("Patch: {}, with Id: {}", beer, beerId);
         return beerService.patchBeer(beerId, beer)
                 .switchIfEmpty(Mono.error(new ResponseStatusException(HttpStatus.NOT_FOUND))).map(patchedBeer -> ResponseEntity.ok()

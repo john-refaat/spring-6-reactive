@@ -2,6 +2,7 @@ package guru.springframework.spring6reactive.services;
 
 import guru.springframework.spring6reactive.mapper.BeerMapper;
 import guru.springframework.spring6reactive.model.BeerDTO;
+import guru.springframework.spring6reactive.model.BeerPatchDTO;
 import guru.springframework.spring6reactive.repositories.BeerRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -44,7 +45,7 @@ public class BeerServiceImpl implements BeerService {
     }
 
     @Override
-    public Mono<BeerDTO> patchBeer(Integer beerId, BeerDTO beerDTO) {
+    public Mono<BeerDTO> patchBeer(Integer beerId, BeerPatchDTO beerDTO) {
         return beerRepository.findById(beerId).map(foundBeer -> {
             foundBeer.setBeerName(beerDTO.getBeerName() == null? foundBeer.getBeerName() : beerDTO.getBeerName());
             foundBeer.setBeerStyle(beerDTO.getBeerStyle() == null? foundBeer.getBeerStyle() : beerDTO.getBeerStyle());
@@ -59,7 +60,7 @@ public class BeerServiceImpl implements BeerService {
     public Mono<Void> deleteBeer(Integer beerId) {
         return beerRepository.deleteById(beerId);
     }
-
+        
     @Override
     public Flux<BeerDTO> listBeers() {
         return beerRepository.findAll().map(beerMapper::beerToBeerDTO);

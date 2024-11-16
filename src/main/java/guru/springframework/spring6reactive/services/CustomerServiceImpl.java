@@ -2,6 +2,7 @@ package guru.springframework.spring6reactive.services;
 
 import guru.springframework.spring6reactive.mapper.CustomerMapper;
 import guru.springframework.spring6reactive.model.CustomerDTO;
+import guru.springframework.spring6reactive.model.CustomerPatchDTO;
 import guru.springframework.spring6reactive.repositories.CustomerRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -44,8 +45,9 @@ public class CustomerServiceImpl implements CustomerService {
     }
 
     @Override
-    public Mono<CustomerDTO> patchCustomer(Integer id, CustomerDTO customerDTO) {
-        return customerRepository.findById(id).map(foundCustomer -> {
+    public Mono<CustomerDTO> patchCustomer(Integer id, CustomerPatchDTO customerDTO) {
+        return customerRepository.findById(id)
+                .map(foundCustomer -> {
             foundCustomer.setFirstName(StringUtils.hasText(customerDTO.getFirstName())? customerDTO.getFirstName() : foundCustomer.getFirstName());
             foundCustomer.setLastName(StringUtils.hasText(customerDTO.getLastName())? customerDTO.getLastName() : foundCustomer.getLastName());
             foundCustomer.setEmail(StringUtils.hasText(customerDTO.getEmail())? customerDTO.getEmail() : foundCustomer.getEmail());

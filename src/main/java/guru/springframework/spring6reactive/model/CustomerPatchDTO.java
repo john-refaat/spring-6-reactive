@@ -1,7 +1,6 @@
 package guru.springframework.spring6reactive.model;
 
 import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -12,24 +11,21 @@ import java.time.LocalDateTime;
 
 /**
  * @author john
- * @since 18/09/2024
+ * @since 29/09/2024
  */
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class CustomerDTO {
+public class CustomerPatchDTO {
     private Integer id;
 
-    @NotBlank
     @Size(min=3, max=50)
     private String firstName;
 
-    @NotBlank
     @Size(min=3, max=50)
     private String lastName;
 
-    @NotBlank
     @Size(min=5, max=100)
     @Email
     private String email;
@@ -41,5 +37,4 @@ public class CustomerDTO {
     public String getFullName() {
         return firstName + " " + lastName;
     }
-
 }

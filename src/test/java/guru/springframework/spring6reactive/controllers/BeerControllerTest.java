@@ -110,11 +110,12 @@ import java.math.BigDecimal;
     @Order(4)
     @Test
     void patchBeerById() {
-        webTestClient.patch().uri(BASE_PATH+"/{beerId}", 1).body(Mono.just(beer), BeerDTO.class)
+        webTestClient.patch().uri(BASE_PATH+"/{beerId}", 1)
+                .body(Mono.just(BeerDTO.builder().beerName("Stella").build()), BeerDTO.class)
                 .header("Content-Type", "application/json")
                 .exchange()
-                .expectHeader().exists("Location")
                 .expectStatus().isOk()
+                .expectHeader().exists("Location")
                 .expectBody(BeerDTO.class);
     }
 
