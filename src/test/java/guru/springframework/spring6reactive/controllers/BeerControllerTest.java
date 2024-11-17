@@ -11,6 +11,8 @@ import reactor.core.publisher.Mono;
 
 import java.math.BigDecimal;
 
+import static org.springframework.security.test.web.reactive.server.SecurityMockServerConfigurers.mockJwt;
+
 /**
  * @author john
  * @since 21/09/2024
@@ -18,7 +20,7 @@ import java.math.BigDecimal;
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 @SpringBootTest
 @AutoConfigureWebTestClient
-    class BeerControllerTest {
+class BeerControllerTest {
 
     private static final String BASE_PATH = "/api/v2/beer";
     private BeerDTO beer;
@@ -28,6 +30,7 @@ import java.math.BigDecimal;
 
     @BeforeEach
     void setUp() {
+        webTestClient = webTestClient.mutateWith(mockJwt());
         beer = BeerDTO.builder()
                 .beerName("New Beer")
                 .beerStyle("New Style")
@@ -39,7 +42,8 @@ import java.math.BigDecimal;
 
     @Test
     void createBeer() {
-        EntityExchangeResult<BeerDTO> result = webTestClient.post().uri(BASE_PATH).body(Mono.just(beer), BeerDTO.class)
+        EntityExchangeResult<BeerDTO> result = webTestClient.post()
+                .uri(BASE_PATH).body(Mono.just(beer), BeerDTO.class)
                 .header("Content-Type", "application/json")
                 .exchange()
                 .expectStatus().isCreated()
