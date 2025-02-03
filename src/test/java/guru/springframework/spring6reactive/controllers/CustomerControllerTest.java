@@ -3,14 +3,13 @@ package guru.springframework.spring6reactive.controllers;
 import guru.springframework.spring6reactive.domain.Customer;
 import guru.springframework.spring6reactive.model.CustomerPatchDTO;
 import lombok.extern.slf4j.Slf4j;
-import org.junit.jupiter.api.MethodOrderer;
-import org.junit.jupiter.api.Order;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestMethodOrder;
+import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.web.reactive.server.WebTestClient;
+
+import static org.springframework.security.test.web.reactive.server.SecurityMockServerConfigurers.mockJwt;
 
 /**
  * @author john
@@ -33,6 +32,10 @@ class CustomerControllerTest {
     @Autowired
     WebTestClient webTestClient;
 
+    @BeforeEach
+    void setUp() {
+        webTestClient = webTestClient.mutateWith(mockJwt());
+    }
 
     @Order(1)
     @Test
